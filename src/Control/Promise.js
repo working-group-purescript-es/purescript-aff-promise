@@ -1,27 +1,20 @@
 // module Control.Promise
 
-export const promise = f => () => {
-  return new Promise(function (success, error) {
-    var succF = function (s) {
-      return function () {
-        return success(s)
-      }
-    }
-    var failF = function (s) {
-      return function () {
-        return error(s)
-      }
-    }
+export function promise(f) {
+  return () => new Promise((success, error) => {
+    const succF = s => () => success(s);
+    const failF = s => () => error(s);
 
     // This indicates the aff was wrong?
-    try {
-      f(succF)(failF)()
-    } catch (e) {
-      error(e)
+    try { f(succF)(failF)(); }
+    catch (e) {
+      error(e);
     }
-  })
+  });
 }
 
-export const thenImpl = promise => errCB => succCB => () => {
-  promise.then(succCB, errCB)
+export function thenImpl(promise) {
+  return errCB => succCB => () => {
+    promise.then(succCB, errCB);
+  };
 }
